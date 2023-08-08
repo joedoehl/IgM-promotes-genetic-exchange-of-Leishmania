@@ -1,5 +1,5 @@
 ---
-title: "IgM promotes genetic exchange of Leishmania: Statistics"
+title: "Genetic exchange in Leishmania is facilitated by a natural antibody: Statistics"
 author: "Johannes Doehl"
 date: "2023-07-12"
 output: html_document
@@ -21,7 +21,7 @@ library(tidyverse) # multi-package that contains several required package inc. g
 
 ## Functions defined by me
 
-This chunk contians two functions that are not common to any packages and are thus defined by me for use in the script.
+This chunk contains two functions that are not common to any packages and are thus defined by me for use in the script.
 
 ```{r Function-definition}
 # Simultaneous data loading from multiple worksheet in same excel files
@@ -50,7 +50,7 @@ zipFastener <- function(df1, df2, along=2)
     stop ("the no. of rows has to be equal to merge them by zip feeding")
   }
   
-  # zip fastener preperations
+  # zip fastener preparations
   d1 <- dim(df1)[along]
   d2 <- dim(df2)[along]
   i1 <- 1:d1           # index vector 1
