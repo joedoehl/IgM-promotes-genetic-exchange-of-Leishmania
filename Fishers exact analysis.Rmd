@@ -21,7 +21,7 @@ library(tidyverse) # multi-package that contains several required package inc. g
 
 ## Functions defined by me
 
-This chunk contians two functions that are not common to any packages and are thus defined by me for use in the script
+This chunk contians two functions that are not common to any packages and are thus defined by me for use in the script.
 
 ```{r Function-definition}
 # Simultaneous data loading from multiple worksheet in same excel files
@@ -83,34 +83,32 @@ zipFastener <- function(df1, df2, along=2)
 
 ## Variable information
 
-This chunk contains variables that require adjustments to work with different experiments and data directories
+This chunk contains variables that require adjustments to work with different experiments and data directories.
 
 ```{r Variable-information}
 # File Paths
-BiblioPath1 <- "C:/Users/doehljs/Box/Clump quantification/Dose response_Experiment/"
-Output <- "Data Analysis Output/"
-FilNam1 <- "Tiago/Data_Summary_In_Vivo_Clump_LLJB_Rearranged.xlsx"
-# FilNam1 <- "Tiago/F2_Crosses.xlsx"
-FilNam2 <- "Tiago/main tables.xlsx"
-# FilNam2 <- "Tiago/main tables F2 Crosses.xlsx"
+BiblioPath1 <- "C:/Users/doehljs/Box/Clump quantification/Dose response_Experiment/" # Root directory
 
-# Lables
-GrpNam <- c( "1BM", "2BM -IgM", "2BM +IgM", "Mouse")
+Output <- "Data Analysis Output/" # Folder for data output
+
+FilNam1 <- "Tiago/Data_Summary_In_Vivo_Clump_LLJB_Raw.xlsx" # Location of raw data file
 ```
 
 ## Data loading
+
+Read in the raw data table from the excel workbook
 
 ```{r Data-loading}
 # Loads all worksheets from xlsx
 ClmpDat <- read_all(paste0(BiblioPath1, FilNam1))
 
+# Vector of names of experiments (names from the xlsx file worksheets)
 FigNam <- names(ClmpDat)
-
-# Loads all worksheets from xlsx
-FigTabDat <- read_all(paste0(BiblioPath1, FilNam2))
 ```
 
 ## Data reformating into contingency tables 
+
+This chunk reformat the data from the excel spreadsheets into contingency tables by day of observation, where applicable 
 
 ```{r Contingency-tables}
 options(scipen=5) # sets numbers of decimals permitted before scientific nomenclature takes over
@@ -149,8 +147,10 @@ for (aa in 1:length(ClmpDat)){
       ByCnt <- as.table(ByCnt)
     }
     
+    # Creats percentage of count table by column
     ByPctCol <- as.data.frame.array(round(prop.table(ByCnt, margin = 2), 3) * 100)
     
+    # Creats percentage of count table by row
     ByPctRow <- as.data.frame.array(round(prop.table(ByCnt, margin = 1), 3) * 100)
     
     ByCnt <- as.data.frame.array(ByCnt)
@@ -165,12 +165,15 @@ for (aa in 1:length(ClmpDat)){
 }
 names(ClmpTabList) <- FigNam
 
+# Removes unwanted variables
 rm(aa, bb, ByCnt, ByPctCol, ByPctRow, ListFrq)
 
 gc() # Garbage collection
 ```
 
 ## Fisher's Exact test
+
+This chunk performs the Fisher's exact test on the data
 
 ```{r Fishers-exact}
 # Creates a list to store the test output data
@@ -183,19 +186,19 @@ for (aa in 1:length(ClmpTabList)) {
   
   for (bb in 1:length(Days)) {
     # Fisher's exact test for a 2 x 4 table of count data
-    tryCatch({fisher.test(ClmpTabList[[aa]][[bb]][["Count"]], simulate.p.value = TRUE); EM <<- 0},
+    tryCatch({fisher.test(ClmpTabList[[aa]][[bb]][["Count"]], simulate.p.value = TRUE); EM <<- 0}, # In case one roq is all zeros
              error = function(e) {EM <<- 1});
     
     if (EM == 0) {
       # Fisher's Exact test for R x C table
       FT <- ClmpTabList[[aa]][[bb]][["Count"]] %>% 
-        # { if ("Mice" %in% colnames(.) == TRUE) select(., -Mice) else . } %>% 
-        fisher_test(., simulate.p.value = TRUE) # we are excluding the "Mice" data column from the raw data analysis
+        # { if ("Mice" %in% colnames(.) == TRUE) select(., -Mice) else . } %>% # In case of exclusion of the "Mice" data column 
+        fisher_test(., simulate.p.value = TRUE) 
       
       if (FT$p < 0.05) {
         # Pairwsie comparaison as a post hoc test to Chi Square / Fisher's exact test with table exceeding 2 x 2 format
         pwcFT <- ClmpTabList[[aa]][[bb]][["Count"]] %>% 
-          # { if ("Mice" %in% colnames(.) == TRUE) select(., -Mice) else . } %>%
+          # { if ("Mice" %in% colnames(.) == TRUE) select(., -Mice) else . } %>% # In case of exclusion of the "Mice" data column 
           pairwiseNominalIndependence(.,
                                       compare = "column",
                                       fisher = TRUE, # Fisher's Exact test executed for the pair
@@ -246,6 +249,8 @@ gc()
 ```
 
 ## Saving test outputs
+
+This chunk saves the test's output to an excel file in a desired location. Note that locations need to be adjusted as desired.
 
 ```{r Saving-data}
 # Will remove saved xlsx spreadsheets, if they already exist so the can be replaced as overwrite does not work here
