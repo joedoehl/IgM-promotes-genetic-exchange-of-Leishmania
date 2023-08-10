@@ -43,8 +43,6 @@ This chunk contains variables that require adjustments to work with different ex
 # File Paths
 BiblioPath1 <- "C:/Users/doehljs/Box/Clump quantification/Dose response_Experiment/" # Root directory
 
-Output <- "Data Analysis Output/" # Folder for data output
-
 FilNam1 <- "Tiago/Data_Summary_In_Vivo_Clump_LLJB_Raw.xlsx" # Location of raw data file
 ```
 
@@ -223,8 +221,8 @@ sapply(SheetNames, function(x) { addWorksheet(wb, sheetName = x) }, simplify = F
 mapply(function(x, y) { 
   writeData(wb, sheet = y, x = x, startRow = 1, startCol = 1, rowNames = TRUE) 
   }, x = unlist(unlist(ClmpFshList, recursive = FALSE), recursive = FALSE), y = SheetNames)
-
-saveWorkbook(wb, file = "Statisitcs Table (Jul 23).xlsx", overwrite = TRUE)
+getwd()
+saveWorkbook(wb, file = paste(dirname(getwd()), "Data", "Statisitcs Table (Jul 23).xlsx", sep = "/"), overwrite = TRUE)
 
 gc()
 ```
